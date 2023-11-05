@@ -13,13 +13,16 @@ P -> "at" | "before" | "in" | "of" | "on" | "to"
 V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
-# I had a little moist red paint in the palm of my hand.
+# 
 NONTERMINALS = """
-S -> NV | NV DN | NV DN P N | NV P DAN Conj N V | Det NV DAN | NV P N | N Adv V Det N Conj NV P Det N Adv | N V Adv Conj V Det N | N V Det Adj N P N Conj V N P Det Adj N | N V Det Adj Adj Adj N P Det N P Det N 
-NV -> N V
-DN -> Det N
-DA -> Det Adj
-DAN -> DA N
+S -> NV | NV NP | NV NP P NP | NV P DAN Conj NP V | Det NV DAN | NV P NP | NP Adv V NP Conj NV P NP Adv
+S -> NP V Adv Conj V NP | NP V DAN P NP Conj V NP P Det AAA NP | NP V Det AAA NP P NP P NP 
+NV -> NP V
+DN -> Det NP
+DAN -> Det Adj | Det Adj NP
+AAA -> Adj | Adj Adj | Adj Adj Adj
+NVDN -> NP V D NP
+NP -> N | Det N
 """
 #SIMPLIFICAR
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
@@ -54,41 +57,30 @@ def main():
     for tree in trees:
         tree.pretty_print()
 
-        print("Noun Phrase Chunks")
+        print("Noun Phrases Chunks:")
         for np in np_chunk(tree):
-            print(" ".join(np.flatten()))
+            print(" ".join(np.leaves()))
 
 
 def preprocess(sentence):
-    """
-    Convert `sentence` to a list of its words.
-    Pre-process sentence by converting all characters to lowercase
-    and removing any word that does not contain at least one alphabetic
-    character.
-    """
     words = nltk.word_tokenize(sentence.lower())
     words = [word for word in words if any(char.isalpha() for char in word)]
     return words
 
-
-
 def np_chunk(tree):
-    """
-    Return a list of all noun phrase chunks in the sentence tree.
-    A noun phrase chunk is defined as any subtree of the sentence
-    whose label is "NP" that does not itself contain any other
-    noun phrases as subtrees.
-    """
     np_chunks = []
 
-    for subtree in tree.subtrees(lambda t: t.label() == "NP"):
-        # Check if the subtree contains any other NP subtrees
-        contains_np = any(subtree.label() == "NP" for subtree in subtree.subtrees())
+    for subtree in tree.subtrees(lambda t: t.label() in ["NP"]):
+        contains_np = any((subtree.label() == "NP" or subtree.label() == "N")  for subtree in subtree.subtrees())
 
-        if not contains_np:
+        if contains_np:
             np_chunks.append(subtree)
 
-    return np_chunks
+    noun_phrases = []
+    for np_chunk in np_chunks:
+        noun_phrases.append(np_chunk)
+
+    return noun_phrases
 
 
 
