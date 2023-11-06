@@ -13,18 +13,19 @@ P -> "at" | "before" | "in" | "of" | "on" | "to"
 V -> "arrived" | "came" | "chuckled" | "had" | "lit" | "said" | "sat"
 V -> "smiled" | "tell" | "were"
 """
-# 
-NONTERMINALS = """
-S -> NV | NV NP | NV NP P NP | NV P DAN Conj NP V | Det NV DAN | NV P NP | NP Adv V NP Conj NV P NP Adv
-S -> NP V Adv Conj V NP | NP V DAN P NP Conj V NP P Det AAA NP | NP V Det AAA NP P NP P NP 
-NV -> NP V
+ #1 - 1 Y 2, 2 -> 6
+NONTERMINALS = """ 
+S -> NV | NV PN | NV DAN CPV | NV DAN | NP Adv V NP CPV NP Adv
+S -> NV Adv CPV | NV DAN P NP CPV PN DAN NP | NV DAN PN 
+NV -> NP V | NP V P | V NP | NP V NP
+CPV -> Conj NV | Conj V
 DN -> Det NP
-DAN -> Det Adj | Det Adj NP
+DAN -> Det AAA | Det AAA NP
 AAA -> Adj | Adj Adj | Adj Adj Adj
-NVDN -> NP V D NP
 NP -> N | Det N
+PN -> NP P | NP P NP P NP | P NP | NP P NP
 """
-#SIMPLIFICAR
+
 grammar = nltk.CFG.fromstring(NONTERMINALS + TERMINALS)
 parser = nltk.ChartParser(grammar)
 
