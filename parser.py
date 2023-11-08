@@ -77,11 +77,7 @@ def np_chunk(tree):
         if contains_np:
             np_chunks.append(subtree)
 
-    noun_phrases = []
-    for np_chunk in np_chunks:
-        noun_phrases.append(np_chunk)
-
-    return noun_phrases
+    return np_chunks
 
 
 
